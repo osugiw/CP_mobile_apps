@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mobile_apps/widgets/sally_logo.dart';
+import 'package:mobile_apps/widgets/sally_button.dart';
 import 'main.dart'; // Import to navigate to MyHomePage
 
 class LoginPage extends StatefulWidget {
@@ -53,12 +54,8 @@ class _LoginPageState extends State<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Owl Logo
-              SvgPicture.asset(
-                'assets/images/sally_logo.svg', // Reusing your logo
-                width: 100,
-                height: 100,
-              ),
+              // Reusable Owl Logo
+              const SallyLogo(width: 100, height: 100),
               const SizedBox(height: 5),
               // "Welcome Owls!"
               const Text(
@@ -132,26 +129,12 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    // Login Button
+                    // Reusable Login Button
                     Center(
-                      child: ElevatedButton(
+                      child: SallyButton(
+                        text: 'LOGIN',
                         onPressed: _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: logoBlue,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 60, vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30.0),
-                          ),
-                        ),
-                        child: const Text(
-                          'LOGIN',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                        width: 200,
                       ),
                     ),
                     const SizedBox(height: 15),
@@ -183,12 +166,10 @@ class _LoginPageState extends State<LoginPage> {
                   color: Colors.black,
                 ),
               ),
-              // Removed the SizedBox to reduce the gap
               // Rice University Image Logo
               Image.asset(
                 'assets/images/RiceStackedHoriz_Blue.png',
                 width: 200,
-                // Removed fixed height to prevent internal padding
                 fit: BoxFit.contain,
               ),
             ],
