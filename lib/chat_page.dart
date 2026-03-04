@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_apps/widgets/sally_logo.dart';
+import 'summary_page.dart'; // Import the new SummaryPage
 
 class Transcript {
   final String date;
-  final String deviceName;
+  final String deviceID;
   final String time;
   final String content;
   final String fatigueLevel;
@@ -13,7 +14,7 @@ class Transcript {
 
   Transcript({
     required this.date,
-    required this.deviceName,
+    required this.deviceID,
     required this.time,
     required this.content,
     required this.fatigueLevel,
@@ -33,7 +34,7 @@ class _ChatPageState extends State<ChatPage> {
   final List<Transcript> _transcripts = [
     Transcript(
       date: "March 3, 2026",
-      deviceName: "BlueOwl 1",
+      deviceID: "BlueOwl 1",
       time: "2.00 P.M.",
       content: "Lorem ipsum LOREM IPSUM lorem ipsum Lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum",
       fatigueLevel: "x%",
@@ -41,7 +42,7 @@ class _ChatPageState extends State<ChatPage> {
     ),
     Transcript(
       date: "March 2, 2026",
-      deviceName: "BlueOwl 1",
+      deviceID: "BlueOwl 1",
       time: "10.00 A.M.",
       content: "Lorem ipsum LOREM IPSUM lorem ipsum Lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum",
       fatigueLevel: "x%",
@@ -50,7 +51,7 @@ class _ChatPageState extends State<ChatPage> {
     ),
     Transcript(
       date: "March 2, 2026",
-      deviceName: "BlueOwl 1",
+      deviceID: "BlueOwl 1",
       time: "8.00 A.M.",
       content: "Lorem ipsum LOREM IPSUM lorem ipsum Lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum",
       fatigueLevel: "x%",
@@ -64,7 +65,7 @@ class _ChatPageState extends State<ChatPage> {
         0,
         Transcript(
           date: "March 3, 2026",
-          deviceName: "BlueOwl 1",
+          deviceID: "BlueOwl 1",
           time: "4.00 P.M.",
           content: "New dynamic transcription added for testing purposes. LOREM IPSUM lorem ipsum LOREM IPSUM lorem ipsum.",
           fatigueLevel: "15%",
@@ -185,7 +186,7 @@ class TranscriptCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      transcript.deviceName,
+                      transcript.deviceID,
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -232,7 +233,21 @@ class TranscriptCard extends StatelessWidget {
             ),
             if (transcript.hasSummarize)
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Navigate to SummaryPage with data
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SummaryPage(
+                        date: transcript.date,
+                        deviceID: transcript.deviceID,
+                        content: transcript.content,
+                        fatigueLevel: transcript.fatigueLevel,
+                        fillerWordsCount: transcript.fillerWordsCount,
+                      ),
+                    ),
+                  );
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: limeGreen,
                   foregroundColor: Colors.white,
