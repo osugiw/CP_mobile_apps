@@ -4,12 +4,12 @@ import 'package:mobile_apps/widgets/sally_logo.dart';
 
 // 1. Create a data model for the device
 class DeviceInfo {
-  final String name;
+  final String deviceID;
   final String status;
   final int batteryLevel;
 
   DeviceInfo({
-    required this.name,
+    required this.deviceID,
     this.status = "Connected",
     this.batteryLevel = 100,
   });
@@ -30,14 +30,14 @@ class _DevicePageState extends State<DevicePage> {
   void _showBluetoothDialog() {
     // List of all mock devices that can be detected
     final allMockDevices = [
-      {"name": "BlueOwl 1", "signal": "90% Signal"},
-      {"name": "Rice Wearable v2", "signal": "75% Signal"},
-      {"name": "Sally's Pendant", "signal": "60% Signal"},
+      {"deviceID": "BlueOwl 1", "signal": "90% Signal"},
+      {"deviceID": "Rice Wearable v2", "signal": "75% Signal"},
+      {"deviceID": "Sally's Pendant", "signal": "60% Signal"},
     ];
 
     // Filter out devices that are already in the _devices list
     final availableDevices = allMockDevices.where((mock) {
-      return !_devices.any((d) => d.name == mock["name"]);
+      return !_devices.any((d) => d.deviceID == mock["deviceID"]);
     }).toList();
 
     showDialog(
@@ -65,7 +65,7 @@ class _DevicePageState extends State<DevicePage> {
                   )
                 else
                   ...availableDevices.map((mock) {
-                    return _buildDetectedItem(mock["name"]!, mock["signal"]!);
+                    return _buildDetectedItem(mock["deviceID"]!, mock["signal"]!);
                   }).toList(),
               ],
             ),
@@ -81,17 +81,17 @@ class _DevicePageState extends State<DevicePage> {
     );
   }
 
-  Widget _buildDetectedItem(String name, String signal) {
+  Widget _buildDetectedItem(String deviceID, String signal) {
     return ListTile(
       leading: const Icon(Icons.bluetooth, color: Colors.blue),
-      title: Text(name),
+      title: Text(deviceID),
       subtitle: Text(signal),
       onTap: () {
         setState(() {
           // Check if device is already added to prevent duplicates
-          if (!_devices.any((d) => d.name == name)) {
+          if (!_devices.any((d) => d.deviceID == deviceID)) {
             _devices.add(DeviceInfo(
-              name: name,
+              deviceID: deviceID,
               status: "Connected",
               batteryLevel: 100,
             ));
@@ -99,7 +99,7 @@ class _DevicePageState extends State<DevicePage> {
         });
         Navigator.pop(context); // Close the dialog
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("$name added successfully!")),
+          SnackBar(content: Text("$deviceID added successfully!")),
         );
       },
     );
@@ -111,7 +111,7 @@ class _DevicePageState extends State<DevicePage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Remove Device"),
-          content: Text("Are you sure you want to remove ${device.name}?"),
+          content: Text("Are you sure you want to remove ${device.deviceID}?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -124,7 +124,7 @@ class _DevicePageState extends State<DevicePage> {
                 });
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("${device.name} removed")),
+                  SnackBar(content: Text("${device.deviceID} removed")),
                 );
               },
               child: const Text("Yes", style: TextStyle(color: Colors.red)),
@@ -296,7 +296,7 @@ class DeviceItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  device.name,
+                  device.deviceID,
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
