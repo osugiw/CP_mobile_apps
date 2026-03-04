@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'main.dart'; // Import for navigating to MyHomePage
+import 'login_page.dart'; // Import to navigate to LoginPage
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,12 +14,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Wait for 3 seconds, then navigate to the Home Page
-    Timer(const Duration(seconds: 5), () {
+    // Wait for 3 seconds, then navigate to the Login Page
+    Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const MyHomePage(title: 'Home Page'),
+          builder: (context) => const LoginPage(),
         ),
       );
     });
@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const Color logoBlue = Color(0xFF1A335D); // Approximate blue from your image
+    const Color logoBlue = Color(0xFF1A335D);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -35,44 +35,43 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Your icon/logo part
             SvgPicture.asset(
               'assets/images/sally_logo.svg',
-              width: 200,
-              height: 200,
+              width: 180,
+              height: 180,
             ),
-            const SizedBox(height: 20),
-            // "SALLY" Text
+            const SizedBox(height: 10),
             const Text(
               'SALLY',
               style: TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
+                fontSize: 60,
+                fontWeight: FontWeight.w900,
                 color: logoBlue,
                 letterSpacing: 4.0,
               ),
             ),
-            const SizedBox(height: 10),
-            // Tagline
+            const SizedBox(height: 5),
             const Text(
               'YOUR PERSONAL GATEWAY',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: logoBlue,
-                letterSpacing: 1.5,
+                letterSpacing: 1.2,
               ),
             ),
             const Text(
               'TO DAILY CLARITY',
+              textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: logoBlue,
-                letterSpacing: 1.5,
+                letterSpacing: 1.2,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 50),
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(logoBlue),
             ),
