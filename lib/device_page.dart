@@ -28,6 +28,18 @@ class _DevicePageState extends State<DevicePage> {
 
   // This replaces the old dummy auto-add logic
   void _showBluetoothDialog() {
+    // List of all mock devices that can be detected
+    final allMockDevices = [
+      {"name": "BlueOwl 1", "signal": "90% Signal"},
+      {"name": "Rice Wearable v2", "signal": "75% Signal"},
+      {"name": "Sally's Pendant", "signal": "60% Signal"},
+    ];
+
+    // Filter out devices that are already in the _devices list
+    final availableDevices = allMockDevices.where((mock) {
+      return !_devices.any((d) => d.name == mock["name"]);
+    }).toList();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -43,10 +55,18 @@ class _DevicePageState extends State<DevicePage> {
               children: [
                 const LinearProgressIndicator(),
                 const SizedBox(height: 20),
-                // Mock list of detected Bluetooth devices
-                _buildDetectedItem("BlueOwl 1", "90% Signal"),
-                _buildDetectedItem("Rice Wearable v2", "75% Signal"),
-                _buildDetectedItem("Sally's Pendant", "60% Signal"),
+                if (availableDevices.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: Text(
+                      "No new devices found.",
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  )
+                else
+                  ...availableDevices.map((mock) {
+                    return _buildDetectedItem(mock["name"]!, mock["signal"]!);
+                  }).toList(),
               ],
             ),
           ),
@@ -80,6 +100,36 @@ class _DevicePageState extends State<DevicePage> {
         Navigator.pop(context); // Close the dialog
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("$name added successfully!")),
+        );
+      },
+    );
+  }
+
+  void _removeDevice(DeviceInfo device) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Remove Device"),
+          content: Text("Are you sure you want to remove ${device.name}?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _devices.remove(device);
+                });
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("${device.name} removed")),
+                );
+              },
+              child: const Text("Yes", style: TextStyle(color: Colors.red)),
+            ),
+          ],
         );
       },
     );
@@ -132,7 +182,10 @@ class _DevicePageState extends State<DevicePage> {
                     itemCount: _devices.length,
                     separatorBuilder: (context, index) => const SizedBox(height: 16),
                     itemBuilder: (context, index) {
-                      return DeviceItem(device: _devices[index]);
+                      return DeviceItem(
+                        device: _devices[index],
+                        onRemove: () => _removeDevice(_devices[index]),
+                      );
                     },
                   ),
                 ),
@@ -153,7 +206,7 @@ class _DevicePageState extends State<DevicePage> {
             bottom: 20,
             right: 20,
             child: GestureDetector(
-              onTap: _showBluetoothDialog, // Changed from _addDevices
+              onTap: _showBluetoothDialog,
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
@@ -201,8 +254,13 @@ class _DevicePageState extends State<DevicePage> {
 
 class DeviceItem extends StatelessWidget {
   final DeviceInfo device;
+  final VoidCallback onRemove;
 
-  const DeviceItem({super.key, required this.device});
+  const DeviceItem({
+    super.key,
+    required this.device,
+    required this.onRemove,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -277,8 +335,21 @@ class DeviceItem extends StatelessWidget {
               ],
             ),
           ),
-          // More options icon
-          Icon(Icons.more_vert, color: Colors.grey.shade400),
+          // More options icon with PopupMenu
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert, color: Colors.grey.shade400),
+            onSelected: (value) {
+              if (value == 'remove') {
+                onRemove();
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'remove',
+                child: Text('Remove Device', style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
         ],
       ),
     );
