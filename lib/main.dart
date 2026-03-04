@@ -4,6 +4,7 @@ import 'package:mobile_apps/splash_screen.dart';
 import 'package:mobile_apps/widgets/sally_nav_bar.dart';
 import 'package:mobile_apps/device_page.dart';
 import 'package:mobile_apps/chat_page.dart';
+import 'package:mobile_apps/profile_page.dart'; // Import ProfilePage
 import 'package:mobile_apps/widgets/sally_logo.dart';
 import 'package:mobile_apps/widgets/home_card.dart';
 
@@ -46,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
     const HomeContent(),
     const DevicePage(),
     const ChatPage(),
-    const Center(child: Text('Profile Page')),
+    const ProfilePage(), // Add ProfilePage here
   ];
 
   @override
