@@ -11,8 +11,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  // Autofill for testing
+  final TextEditingController _usernameController = TextEditingController(text: "admin");
+  final TextEditingController _passwordController = TextEditingController(text: "password");
   
   // Dummy credentials
   final String _dummyUsername = "admin";
