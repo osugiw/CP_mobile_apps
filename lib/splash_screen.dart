@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'login_page.dart'; // Import to navigate to LoginPage
-import 'package:flutter_svg/flutter_svg.dart';
+import 'login_page.dart'; 
+import 'package:mobile_apps/widgets/sally_logo.dart'; // Import SallyLogo
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,7 +14,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Wait for 3 seconds, then navigate to the Login Page
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
@@ -35,11 +34,8 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SvgPicture.asset(
-              'assets/images/sally_logo.svg',
-              width: 180,
-              height: 180,
-            ),
+            // Use the reusable SallyLogo widget
+            const SallyLogo(width: 180, height: 180),
             const SizedBox(height: 10),
             const Text(
               'SALLY',
