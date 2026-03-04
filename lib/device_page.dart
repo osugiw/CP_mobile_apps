@@ -26,16 +26,63 @@ class _DevicePageState extends State<DevicePage> {
   // 2. List of DeviceInfo objects
   final List<DeviceInfo> _devices = [];
 
-  void _addDevices() {
-    setState(() {
-      // Always add one device at a time, starting with BlueOwl 1
-      int nextId = _devices.length + 1;
-      _devices.add(DeviceInfo(
-        name: "BlueOwl $nextId",
-        status: "Connected",
-        batteryLevel: nextId == 1 ? 100 : (100 - (nextId * 7) % 100), // Dummy varied battery
-      ));
-    });
+  // This replaces the old dummy auto-add logic
+  void _showBluetoothDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Detecting Devices...",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const LinearProgressIndicator(),
+                const SizedBox(height: 20),
+                // Mock list of detected Bluetooth devices
+                _buildDetectedItem("BlueOwl 1", "90% Signal"),
+                _buildDetectedItem("Rice Wearable v2", "75% Signal"),
+                _buildDetectedItem("Sally's Pendant", "60% Signal"),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildDetectedItem(String name, String signal) {
+    return ListTile(
+      leading: const Icon(Icons.bluetooth, color: Colors.blue),
+      title: Text(name),
+      subtitle: Text(signal),
+      onTap: () {
+        setState(() {
+          // Check if device is already added to prevent duplicates
+          if (!_devices.any((d) => d.name == name)) {
+            _devices.add(DeviceInfo(
+              name: name,
+              status: "Connected",
+              batteryLevel: 100,
+            ));
+          }
+        });
+        Navigator.pop(context); // Close the dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("$name added successfully!")),
+        );
+      },
+    );
   }
 
   @override
@@ -106,7 +153,7 @@ class _DevicePageState extends State<DevicePage> {
             bottom: 20,
             right: 20,
             child: GestureDetector(
-              onTap: _addDevices,
+              onTap: _showBluetoothDialog, // Changed from _addDevices
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
