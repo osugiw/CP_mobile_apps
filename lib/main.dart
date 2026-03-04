@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Add this import
+import 'package:flutter/services.dart';
 import 'package:mobile_apps/splash_screen.dart';
 import 'package:mobile_apps/widgets/sally_logo.dart';
 import 'package:mobile_apps/widgets/sally_nav_bar.dart';
 import 'package:mobile_apps/widgets/home_card.dart';
+import 'package:mobile_apps/device_page.dart'; // Import DevicePage
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Hide the bottom system navigation bar and top status bar
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(const MyApp());
 }
@@ -41,6 +41,36 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
+  // List of pages to display based on the selected navbar index
+  final List<Widget> _pages = [
+    const HomeContent(),
+    const DevicePage(),
+    const Center(child: Text('Chat Page')),
+    const Center(child: Text('Profile Page')),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      // The body now switches based on _selectedIndex
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: SallyNavBar(
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+      ),
+    );
+  }
+}
+
+// Extracted the home page UI into its own widget to clean up main.dart
+class HomeContent extends StatelessWidget {
+  const HomeContent({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,11 +82,11 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Row(
           children: [
             const SallyLogo(width: 40, height: 40),
-            Expanded(
+            const Expanded(
               child: Center(
                 child: Text(
                   'Home',
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.black,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
@@ -64,7 +94,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            const SizedBox(width: 40), // Balance the logo on the left
+            const SizedBox(width: 40),
           ],
         ),
         bottom: PreferredSize(
@@ -106,14 +136,6 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: SallyNavBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
       ),
     );
   }
