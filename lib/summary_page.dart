@@ -1,24 +1,35 @@
 import 'package:flutter/material.dart';
 
 class SummaryPage extends StatelessWidget {
-  final String date;
-  final String deviceID;
-  final String content;
-  final String fatigueLevel;
-  final int fillerWordsCount;
-
   const SummaryPage({
     super.key,
-    required this.date,
-    required this.deviceID,
-    required this.content,
-    required this.fatigueLevel,
-    required this.fillerWordsCount,
+    required this.dateLabel,
+    required this.deviceId,
+    required this.transcript,
+    required this.summaryText,
+    required this.headline,
+    required this.intentType,
+    required this.decision,
+    required this.confidenceLabel,
+    required this.scheduledTimeLabel,
+    required this.peopleMentioned,
+    required this.topics,
   });
+
+  final String dateLabel;
+  final String deviceId;
+  final String transcript;
+  final String summaryText;
+  final String headline;
+  final String intentType;
+  final String decision;
+  final String confidenceLabel;
+  final String scheduledTimeLabel;
+  final List<String> peopleMentioned;
+  final List<String> topics;
 
   @override
   Widget build(BuildContext context) {
-    const Color logoBlue = Color(0xFF1A335D);
     const Color lightGrey = Color(0xFFD9D9D9);
 
     return Scaffold(
@@ -27,10 +38,10 @@ class SummaryPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         scrolledUnderElevation: 0,
-        automaticallyImplyLeading: false, // Remove default back button
+        automaticallyImplyLeading: false,
         title: Center(
           child: Text(
-            date,
+            dateLabel,
             style: const TextStyle(
               color: Colors.black,
               fontSize: 24,
@@ -50,71 +61,100 @@ class SummaryPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Summary of Talk',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 16),
-              // Summary Content Container
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: lightGrey,
-                  borderRadius: BorderRadius.circular(12),
-                ),
+              const Center(
                 child: Text(
-                  content,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.red, // Highlighting part of the design
-                    height: 1.4,
+                  'Summary of Talk',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
+              const SizedBox(height: 8),
+              Center(
+                child: Text(
+                  deviceId,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.black54,
+                  ),
+                ),
+              ),
+              if (headline.trim().isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  headline,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              _buildSectionCard(
+                lightGrey,
+                summaryText.trim().isEmpty
+                    ? 'No summary returned yet. Open the transcript below for the raw text.'
+                    : summaryText,
+              ),
               const SizedBox(height: 24),
               const Text(
-                'People in the Conversation',
+                'Intent Details',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
                 children: [
-                  _buildSpeakerCircle(const Color(0xFFE53935), "You"),
-                  const SizedBox(width: 40),
-                  _buildSpeakerCircle(const Color(0xFF388E3C), "Speaker 2"),
+                  _buildAnalyticsBox(_titleCase(intentType), 'Detected', 'Intent Type'),
+                  _buildAnalyticsBox(_titleCase(decision), 'Server Action', 'Decision'),
+                  _buildAnalyticsBox(confidenceLabel, 'Fused Score', 'Confidence'),
+                  _buildAnalyticsBox(scheduledTimeLabel, 'Reminder Time', 'Schedule', isWide: true),
                 ],
               ),
               const SizedBox(height: 24),
               const Text(
-                'Other Analytics',
+                'People Mentioned',
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildAnalyticsBox(fillerWordsCount.toString(), "Counts", "Filler Words"),
-                  const SizedBox(width: 12),
-                  _buildAnalyticsBox("10", "Seconds", "Pausing"),
-                  const SizedBox(width: 12),
-                  _buildAnalyticsBox("1.30", "One hour thirty minutes", "Active time", isWide: true),
-                ],
+              _buildTagList(
+                tags: peopleMentioned,
+                emptyText: 'No people were extracted from this summary.',
               ),
+              const SizedBox(height: 24),
+              const Text(
+                'Topics',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildTagList(
+                tags: topics,
+                emptyText: 'No summary topics were returned.',
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Transcript',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildSectionCard(lightGrey, transcript),
               const SizedBox(height: 40),
-              // Back Button
               SizedBox(
                 width: 160,
                 child: ElevatedButton(
@@ -142,33 +182,76 @@ class SummaryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSpeakerCircle(Color color, String label) {
-    return Column(
-      children: [
-        Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+  Widget _buildSectionCard(Color color, String text) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.black87,
+          height: 1.4,
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildAnalyticsBox(String value, String subValue, String label, {bool isWide = false}) {
+  Widget _buildTagList({
+    required List<String> tags,
+    required String emptyText,
+  }) {
+    if (tags.isEmpty) {
+      return Text(
+        emptyText,
+        style: const TextStyle(
+          fontSize: 14,
+          color: Colors.black54,
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: tags
+          .map(
+            (tag) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8EEF8),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                tag,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Widget _buildAnalyticsBox(
+    String value,
+    String subValue,
+    String label, {
+    bool isWide = false,
+  }) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          width: isWide ? 120 : 70,
-          height: 70,
-          padding: const EdgeInsets.all(8),
+          width: isWide ? 160 : 120,
+          constraints: const BoxConstraints(minHeight: 88),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: const Color(0xFFD9D9D9),
             borderRadius: BorderRadius.circular(8),
@@ -178,22 +261,41 @@ class SummaryPage extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 4),
               Text(
                 subValue,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 9, color: Colors.black54),
+                style: const TextStyle(fontSize: 10, color: Colors.black54),
               ),
             ],
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+        SizedBox(
+          width: isWide ? 160 : 120,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
         ),
       ],
     );
+  }
+
+  String _titleCase(String value) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      return 'Unknown';
+    }
+
+    return trimmed
+        .split(RegExp(r'[_\s]+'))
+        .where((part) => part.isNotEmpty)
+        .map((part) => '${part[0].toUpperCase()}${part.substring(1).toLowerCase()}')
+        .join(' ');
   }
 }

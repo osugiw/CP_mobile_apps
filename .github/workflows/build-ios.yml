@@ -1,0 +1,44 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_base_url:
+        description: 'Sally API Base URL (e.g. http://100.120.159.54:5000)'
+        required: true
+        default: 'http://100.120.159.54:5000'
+      device_id:
+        description: 'Device ID'
+        required: true
+        default: 'esp32_01'
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.41.7'
+          channel: 'stable'
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build IPA (no codesign)
+        run: |
+          flutter build ipa --no-codesign \
+            --dart-define=SALLY_API_BASE_URL=${{ github.event.inputs.api_base_url }} \
+            --dart-define=SALLY_API_TOKEN=${{ secrets.SALLY_API_TOKEN }} \
+            --dart-define=SALLY_DEVICE_ID=${{ github.event.inputs.device_id }}
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sally-ios-ipa
+          path: build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app
+          retention-days: 7
