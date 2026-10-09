@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 
 import 'app_config.dart';
 import 'widgets/sally_logo.dart';
+import 'widgets/stress_analysis_card.dart';
 
 // ── lightweight API helper ────────────────────────────────────────────────────
 
 class _DayApi {
-  _DayApi() {
-    _client = HttpClient()..connectionTimeout = const Duration(seconds: 10);
-  }
-  late final HttpClient _client;
+  // Created lazily (only on the first real request). dart:io's HttpClient
+  // doesn't exist on Flutter web, so creating it up front crashes the page
+  // on Chrome even in demo mode, where no request is ever made.
+  late final HttpClient _client =
+      HttpClient()..connectionTimeout = const Duration(seconds: 10);
 
   Map<String, String> get _headers => {
         'Authorization': 'Bearer $sallyApiToken',
@@ -23,6 +25,23 @@ class _DayApi {
     required String deviceId,
     bool refresh = false,
   }) async {
+    if (kDemoMode) {
+      // Same shape as the real /summary/window response.
+      await Future.delayed(const Duration(milliseconds: 600));
+      return {
+        'summary': {
+          'headline': 'A busy day with a stressful insurance call, then a relaxed lunch with your sister.',
+          'mood': 'Mostly calm, one tense moment',
+          'summary': 'You sorted out the crib delay with your partner, spent a long call with the '
+              'insurance company about the ultrasound claim, and started planning the baby shower.',
+          'topics': ['Ultrasound claim', 'Baby shower', 'Nursery budget'],
+          'action_items': [
+            'Call the clinic for a new referral number',
+            'Send the guest list to your sister',
+          ],
+        },
+      };
+    }
     final uri = Uri.parse('$sallyApiBaseUrl/summary/window').replace(
       queryParameters: {
         'device_id': deviceId,
@@ -112,13 +131,30 @@ class _MyDayPageState extends State<MyDayPage> {
           ],
         ),
       ),
-      body: _buildBody(),
+      // One scrolling list: stress dashboard first, then the day summary.
+      // The stress card loads its own (dummy) data, so it still shows even
+      // when the summary server can't be reached.
+      body: RefreshIndicator(
+        onRefresh: () async => _load(refresh: true),
+        color: kBlue,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            const StressAnalysisCard(),
+            const SizedBox(height: 28),
+            _sectionTitle('Your day so far'),
+            const SizedBox(height: 12),
+            _buildBody(),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildBody() {
     if (_loading) {
-      return const Center(
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -200,11 +236,8 @@ class _MyDayPageState extends State<MyDayPage> {
     final topics      = (summaryMap['topics'] as List?)    ?? [];
     final actions     = (summaryMap['action_items'] as List?) ?? [];
 
-    return RefreshIndicator(
-      onRefresh: () async => _load(refresh: true),
-      color: kBlue,
-      child: ListView(
-        padding: const EdgeInsets.all(20),
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Headline banner
           if (headline.isNotEmpty) ...[
@@ -233,9 +266,12 @@ class _MyDayPageState extends State<MyDayPage> {
               children: [
                 const Icon(Icons.mood, color: kBlue, size: 26),
                 const SizedBox(width: 10),
-                Text(
-                  'Mood: $mood',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: kBlue),
+                // Expanded lets long moods wrap instead of overflowing the Row.
+                Expanded(
+                  child: Text(
+                    'Mood: $mood',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: kBlue),
+                  ),
                 ),
               ],
             ),
@@ -306,7 +342,6 @@ class _MyDayPageState extends State<MyDayPage> {
           ),
           const SizedBox(height: 32),
         ],
-      ),
     );
   }
 

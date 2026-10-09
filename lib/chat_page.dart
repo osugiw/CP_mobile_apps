@@ -101,14 +101,14 @@ class _ChatPageState extends State<ChatPage> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('Ask Sally', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('I\'m here to help you remember', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  Text('Ask me about your day', style: TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
           ],
         ),
       ),
-      body: !isSallyApiConfigured
+      body: !isSallyApiConfigured && !kDemoMode
           ? _buildNotConfigured()
           : Column(
               children: [
@@ -135,7 +135,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
             SizedBox(height: 8),
             Text(
-              'Ask your caregiver to set up the connection.',
+              'Check the server connection in Settings.',
               style: TextStyle(fontSize: 16, color: Colors.black54, height: 1.5),
               textAlign: TextAlign.center,
             ),
@@ -161,7 +161,7 @@ class _ChatPageState extends State<ChatPage> {
               ),
               const SizedBox(height: 10),
               Text(
-                'Ask me anything.\nI can help you remember what happened today.',
+                'Ask me anything about your day,\nwhat you talked about or what you planned.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 17, color: Colors.grey.shade600, height: 1.5),
               ),
@@ -309,8 +309,8 @@ class _ChatPageState extends State<ChatPage> {
 
   static const List<String> _suggestions = [
     'What did I talk about today?',
-    'What are my tasks for today?',
-    'Who did I speak with today?',
+    'What did I plan to do this week?',
+    'What did I say about my next appointment?',
   ];
 }
 

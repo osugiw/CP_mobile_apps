@@ -6,6 +6,7 @@ import 'package:mobile_apps/chat_page.dart';
 import 'package:mobile_apps/tasks_page.dart';
 import 'package:mobile_apps/my_day_page.dart';
 import 'package:mobile_apps/settings_page.dart';
+import 'package:mobile_apps/conversations_page.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,11 +47,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
+  // Order must match the items in SallyNavBar.
   static const List<Widget> _pages = [
-    TasksPage(),
-    MyDayPage(),
-    ChatPage(),
-    SettingsPage(),
+    MyDayPage(), // 0: home, with the stress dashboard on top
+    ConversationsPage(), // 1: recorded conversations + transcripts
+    ChatPage(), // 2: Ask Sally
+    TasksPage(), // 3
+    SettingsPage(), // 4
   ];
 
   @override

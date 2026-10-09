@@ -28,16 +28,16 @@ class SallyNavBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _NavItem(
-            icon: Icons.checklist_outlined,
-            activeIcon: Icons.checklist,
-            label: 'My Tasks',
+            icon: Icons.wb_sunny_outlined,
+            activeIcon: Icons.wb_sunny,
+            label: 'My Day',
             isActive: currentIndex == 0,
             onTap: () => onTap(0),
           ),
           _NavItem(
-            icon: Icons.wb_sunny_outlined,
-            activeIcon: Icons.wb_sunny,
-            label: 'My Day',
+            icon: Icons.forum_outlined,
+            activeIcon: Icons.forum,
+            label: 'Talks',
             isActive: currentIndex == 1,
             onTap: () => onTap(1),
           ),
@@ -49,11 +49,18 @@ class SallyNavBar extends StatelessWidget {
             onTap: () => onTap(2),
           ),
           _NavItem(
+            icon: Icons.checklist_outlined,
+            activeIcon: Icons.checklist,
+            label: 'My Tasks',
+            isActive: currentIndex == 3,
+            onTap: () => onTap(3),
+          ),
+          _NavItem(
             icon: Icons.settings_outlined,
             activeIcon: Icons.settings,
             label: 'Settings',
-            isActive: currentIndex == 3,
-            onTap: () => onTap(3),
+            isActive: currentIndex == 4,
+            onTap: () => onTap(4),
           ),
         ],
       ),
@@ -85,7 +92,7 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8), // 5 items: keep narrow
         decoration: BoxDecoration(
           color: isActive ? activeGrey : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
@@ -95,7 +102,7 @@ class _NavItem extends StatelessWidget {
           children: [
             Icon(
               isActive ? activeIcon : icon,
-              size: 30,
+              size: 28,
               color: kBlue,
             ),
             const SizedBox(height: 4),

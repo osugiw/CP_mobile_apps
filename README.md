@@ -168,11 +168,20 @@ Sally captures ambient audio through an ESP32 microphone worn on the body, strea
 │   ├── device_page.dart      # Device status and settings
 │   ├── profile_page.dart     # User profile
 │   ├── intent_record.dart    # Intent data model
+│   ├── conversations_page.dart   # Conversations list + transcripts (dummy data)
+│   ├── recommendation_page.dart  # Stay Calm suggestions + guided breathing
+│   ├── models/
+│   │   ├── stress_reading.dart   # Stress levels, readings, StressRepository
+│   │   ├── conversation.dart     # Conversation model, ConversationRepository
+│   │   └── recommendation.dart   # Suggestions per stress level
 │   └── widgets/
 │       ├── sally_nav_bar.dart # Animated 5-item bottom nav
 │       ├── sally_button.dart  # Branded primary button
 │       ├── sally_logo.dart    # SVG logo component
 │       ├── home_card.dart     # Metric card widget
+│       ├── stress_analysis_card.dart   # My Day stress dashboard card
+│       ├── stress_timeline_chart.dart  # Tappable stress chart (CustomPainter)
+│       ├── stress_strip.dart           # Mini per-conversation stress bars
 │       └── nav_item.dart      # Nav bar item
 │
 ├── assets/images/            # SVG/PNG branding assets
@@ -364,11 +373,15 @@ Sally uses PostgreSQL 15 with the `pgvector` extension. `schema.sql` is fully id
 
 | Tab | Page | Description |
 |---|---|---|
-| 0 | Home | Recent recordings and quick stats |
-| 1 | Device | Device status and configuration |
-| 2 | Chat | Transcript browser + Sally Q&A |
-| 3 | Summary | Window summaries (6h / Today) + Reminders |
-| 4 | Profile | User settings |
+| 0 | My Day | Voice stress dashboard (current level, timeline, timestamped moments) + today's summary |
+| 1 | Talks | Conversations list: mood chip, one-line summary, stress strip, transcript on tap |
+| 2 | Ask Sally | Q&A chat grounded in your transcripts |
+| 3 | My Tasks | Reminders and to-dos extracted from conversations |
+| 4 | Settings | Name, device info, support contacts |
+
+**Stay Calm** (`recommendation_page.dart`) opens from the stress card or from any tense conversation. It shows suggestions for the detected level (Calm / Elevated / High), a guided slow-breathing exercise, and support contacts on High.
+
+> Stress data and conversations currently use **dummy data** (`StressRepository`, `ConversationRepository` in `lib/models/`). Each repository has one fetch method to swap for a server call, and the models already include `fromJson`.
 
 ### Compile-time Configuration
 

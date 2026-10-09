@@ -107,21 +107,22 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 12),
             _InfoRow(label: 'Device ID',   value: sallyDeviceId),
             const SizedBox(height: 8),
-            _InfoRow(label: 'Server',      value: sallyApiBaseUrl),
+            _InfoRow(label: 'Server',      value: kDemoMode ? 'Demo mode (no server)' : sallyApiBaseUrl),
             const SizedBox(height: 28),
 
             // ── Family contacts ───────────────────────────────────────────
-            _sectionHeader('Family Alert Contacts', Icons.family_restroom),
+            _sectionHeader('Support Contacts', Icons.family_restroom),
             const SizedBox(height: 8),
             Text(
-              'If something unusual is detected, an SMS alert '
-              'will be sent to these phone numbers.',
+              'People you trust, like your partner or a family member. '
+              'If SALLY detects something that needs attention, '
+              'an SMS alert will be sent to these numbers.',
               style: TextStyle(fontSize: 15, color: Colors.grey.shade600, height: 1.5),
             ),
             const SizedBox(height: 16),
             _LargeField(
               controller: _phone1Ctrl,
-              label: 'Family member 1',
+              label: 'Partner or family member',
               hint: '+1 (555) 000-0001',
               icon: Icons.phone_outlined,
               keyboard: TextInputType.phone,
@@ -129,7 +130,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 12),
             _LargeField(
               controller: _phone2Ctrl,
-              label: 'Family member 2 (optional)',
+              label: 'Second contact (optional)',
               hint: '+1 (555) 000-0002',
               icon: Icons.phone_outlined,
               keyboard: TextInputType.phone,
@@ -137,7 +138,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 12),
             _LargeField(
               controller: _phone3Ctrl,
-              label: 'Family member 3 (optional)',
+              label: 'Third contact (optional)',
               hint: '+1 (555) 000-0003',
               icon: Icons.phone_outlined,
               keyboard: TextInputType.phone,
@@ -185,7 +186,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Expanded(
                     child: Text(
                       'SMS alerts require Twilio to be configured on the server. '
-                      'Contact your caregiver or administrator to enable this feature.',
+                      'Ask whoever set up your SALLY server to enable this feature.',
                       style: TextStyle(fontSize: 14, color: Colors.amber.shade900, height: 1.5),
                     ),
                   ),

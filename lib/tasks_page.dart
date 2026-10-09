@@ -36,10 +36,30 @@ class TaskReminder {
 // ── API ───────────────────────────────────────────────────────────────────────
 
 class _TasksApi {
-  _TasksApi() {
-    _client = HttpClient()..connectionTimeout = const Duration(seconds: 10);
-  }
-  late final HttpClient _client;
+  // Created lazily (only on the first real request). dart:io's HttpClient
+  // doesn't exist on Flutter web, so creating it up front crashes the page
+  // on Chrome even in demo mode, where no request is ever made.
+  late final HttpClient _client =
+      HttpClient()..connectionTimeout = const Duration(seconds: 10);
+
+  // Demo mode: tasks live in memory (static, so they survive switching tabs).
+  static int _demoNextId = 3;
+  static final List<TaskReminder> _demoTasks = [
+    TaskReminder(
+      id: 1,
+      title: 'Call the clinic for a new referral number',
+      notes: 'For the ultrasound insurance claim',
+      status: 'pending',
+      scheduledTime: '2026-10-09T09:00',
+    ),
+    TaskReminder(
+      id: 2,
+      title: 'Send the baby shower guest list to your sister',
+      notes: '',
+      status: 'pending',
+      scheduledTime: null,
+    ),
+  ];
 
   Map<String, String> get _headers => {
         'Authorization': 'Bearer $sallyApiToken',
@@ -47,6 +67,10 @@ class _TasksApi {
       };
 
   Future<List<TaskReminder>> fetchPending(String deviceId) async {
+    if (kDemoMode) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      return List.of(_demoTasks);
+    }
     final uri = Uri.parse('$sallyApiBaseUrl/reminders').replace(
       queryParameters: {'device_id': deviceId, 'status': 'pending'},
     );
@@ -60,6 +84,10 @@ class _TasksApi {
   }
 
   Future<void> markDone(int id) async {
+    if (kDemoMode) {
+      _demoTasks.removeWhere((t) => t.id == id);
+      return;
+    }
     final uri = Uri.parse('$sallyApiBaseUrl/reminders/$id');
     final req = await _client.patchUrl(uri);
     _headers.forEach(req.headers.set);
@@ -76,6 +104,16 @@ class _TasksApi {
     required String title,
     String? notes,
   }) async {
+    if (kDemoMode) {
+      _demoTasks.add(TaskReminder(
+        id: _demoNextId++,
+        title: title,
+        notes: notes ?? '',
+        status: 'pending',
+        scheduledTime: null,
+      ));
+      return;
+    }
     final uri = Uri.parse('$sallyApiBaseUrl/reminders');
     final req = await _client.postUrl(uri);
     _headers.forEach(req.headers.set);
@@ -139,7 +177,7 @@ class _TasksPageState extends State<TasksPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Great job! Task completed.', style: TextStyle(fontSize: 16)),
+            content: const Text('Nice, marked as done.', style: TextStyle(fontSize: 16)),
             backgroundColor: kGreen,
             duration: const Duration(seconds: 2),
           ),
@@ -287,12 +325,12 @@ class _TasksPageState extends State<TasksPage> {
                     Icon(Icons.check_circle, size: 80, color: Colors.green.shade300),
                     const SizedBox(height: 20),
                     const Text(
-                      'All done for today!',
+                      'All caught up!',
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1A335D)),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'You have no tasks right now.',
+                      'Nothing on your list right now. Take it easy.',
                       style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
                     ),
                   ],
@@ -399,7 +437,7 @@ class _TaskCard extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: onDone,
                 icon: const Icon(Icons.check_circle_outline, size: 26),
-                label: const Text('I Did This!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                label: const Text('Mark as done', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2E7D32),
                   foregroundColor: Colors.white,

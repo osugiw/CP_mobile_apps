@@ -14,12 +14,14 @@ class SallyApiException implements Exception {
 }
 
 class SallyApiClient {
-  SallyApiClient({HttpClient? httpClient})
-      : _httpClient = httpClient ?? HttpClient() {
-    _httpClient.connectionTimeout = const Duration(seconds: 10);
-  }
+  SallyApiClient({HttpClient? httpClient}) : _injectedClient = httpClient;
 
-  final HttpClient _httpClient;
+  final HttpClient? _injectedClient;
+
+  // Created lazily (only on the first real request), so the app also runs on
+  // Flutter web in demo mode, where dart:io's HttpClient doesn't exist.
+  late final HttpClient _httpClient = (_injectedClient ?? HttpClient())
+    ..connectionTimeout = const Duration(seconds: 10);
 
   Future<List<IntentRecord>> fetchIntents({
     String deviceId = sallyDeviceId,
@@ -111,6 +113,12 @@ class SallyApiClient {
     String deviceId = sallyDeviceId,
     List<Map<String, String>> history = const [],
   }) async {
+    if (kDemoMode) {
+      await Future.delayed(const Duration(milliseconds: 1200)); // shows the typing dots
+      return 'This is a demo answer, the server is not connected. '
+          'Today you talked with your partner about the crib delay, called the insurance '
+          'company about the ultrasound claim, and planned the baby shower with your sister.';
+    }
     if (!isSallyApiConfigured) {
       throw SallyApiException('Set SALLY_API_BASE_URL before asking Sally.');
     }
